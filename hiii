@@ -1,0 +1,63 @@
+import sqlite3
+conn = sqlite3.connect('Data.db')
+cur = conn.cursor()
+
+def run():
+    inorout = input("\n Do you want signin or signup:  ")
+    if inorout in ["signin",'Signin','SIGNIN']:
+        tablecheck()
+        signin()
+    elif inorout in ['Signup','signup',"SIGNUP"]:
+        tablecheck()
+        signup()
+    else:
+        print("\n Enter a valid data")
+        run()
+
+
+def tablecheck():
+    cur.execute("select name from sqlite_master where type = 'table' ;")
+    tablelist = cur.fetchall()
+    #print(tablelist)
+    if ('userdetail',) in tablelist:
+        pass
+    else:
+        cur.execute("create table userdetail(Name ,password )")
+        conn.commit()
+
+
+def signup():
+    name = input("\n Enter your name :")
+    password = input("\n Enter your password: ")
+    confirm_pw = input("\n Reenter your password: ")
+    if password == confirm_pw:
+        cur.execute("insert into userdetail values('{}', '{}')".format(name,password))
+        print("\n Data is successfully stored. ")
+        conn.commit()
+        signin()
+    else:
+        print("\n Invalid data. ")
+        run()
+
+def signin():
+    name = input("\n Enter your name :")
+    password = input("\n Enter your password: ")
+    cur.execute("select * from userdetail")
+    datas = cur.fetchall()
+    if datas != '':
+        for n in datas:
+            if n[0] == name:
+                if n[1] == password:
+                    print("\n You successfully signedin. ")
+                    return ''
+                    break
+                else:
+                    print("\n Enter a correct password. ")
+                    break
+            else:
+                print("\n User name is not found. ")
+                break
+    else:
+        print("\n User name is not found. ")
+    run()
+run()
